@@ -1,7 +1,21 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Service } from './Service';
 
 function App() {
+
+  const [formFields, setFormFields] = useState({
+    name: '',
+    paymentStatus: 'CURRENT',
+    leaseEndDate: '',
+  })
+
+  const handleChange = (e) => {
+    console.log(e.target.name, e.target.value)
+    setFormFields({
+      ...formFields,
+      [e.target.name]: e.target.value
+    })
+  }
 
   return (
       <>
@@ -48,18 +62,33 @@ function App() {
           <form>
             <div className="form-group">
               <label>Name</label>
-              <input className="form-control"/>
+              <input 
+                className="form-control" 
+                name='name' 
+                value={formFields.name} 
+                onChange={handleChange}
+              />
             </div>
             <div className="form-group">
               <label>Payment Status</label>
-              <select className="form-control">
+              <select 
+                className="form-control" 
+                name='paymentStatus' 
+                value={formFields.paymentStatus} 
+                onChange={handleChange}
+              >
                 <option>CURRENT</option>
                 <option>LATE</option>
               </select>
             </div>
             <div className="form-group">
               <label>Lease End Date</label>
-              <input className="form-control"/>
+              <input 
+                className="form-control" 
+                name='leaseEndDate' 
+                value={formFields.leaseEndDate} 
+                onChange={handleChange}
+              />
             </div>
             <button className="btn btn-primary">Save</button>
             <button className="btn">Cancel</button>
