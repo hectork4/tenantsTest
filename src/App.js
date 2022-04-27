@@ -1,6 +1,12 @@
 import React, {useState} from 'react';
 import { Service } from './Service';
 
+const TAB_NAVIGATOR = {
+  all: 'All',
+  paymentDate: 'Payment is late',
+  leaseEndDate: 'Lease ends in less than a month'
+} 
+
 function App() {
 
   const [formFields, setFormFields] = useState({
@@ -8,6 +14,7 @@ function App() {
     paymentStatus: 'CURRENT',
     leaseEndDate: '',
   })
+  const [tabActive, setTabActive] = useState()
 
   const handleChange = (e) => {
     console.log(e.target.name, e.target.value)
@@ -17,20 +24,28 @@ function App() {
     })
   }
 
+  const handleTabClick = (e, tab) => {
+    console.log(e, tab)
+    e.preventDefault();
+    setTabActive(tab)
+  }
+
   return (
       <>
         <div className="container">
           <h1>Tenants</h1>
           <ul className="nav nav-tabs">
-            <li className="nav-item">
-              <a className="nav-link active" href="#">All</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">Payment is late</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">Lease ends in less than a month</a>
-            </li>
+            {Object.values(TAB_NAVIGATOR).map((eachTab) => 
+              <li className="nav-item" key={eachTab}>
+                <a 
+                  className={`nav-link ${eachTab === tabActive ? 'active' : ''}`} 
+                  href="#"
+                  onClick={(e) => handleTabClick(e, eachTab)}
+                >
+                  {eachTab}
+                </a>
+              </li>
+            )}
           </ul>
           <table className="table">
             <thead>
