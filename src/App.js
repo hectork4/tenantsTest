@@ -15,20 +15,23 @@ const HEADERS = {
   action: 'Actions'
 }
 
+const INITIAL_FORM = {
+  name: '',
+  paymentStatus: 'CURRENT',
+  leaseEndDate: '',
+}
+
 function App() {
 
   const now = new Date()
   const minDate = now.toISOString();
 
-  const [formFields, setFormFields] = useState({
-    name: '',
-    paymentStatus: 'CURRENT',
-    leaseEndDate: '',
-  })
+  const [formFields, setFormFields] = useState(INITIAL_FORM)
   const [tabActive, setTabActive] = useState(TAB_NAVIGATOR.all)
   const [data, setData] = useState()
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [show, setShow] = useState(false)
 
   const handleChange = (e) => {
     console.log(e.target.name, e.target.value)
@@ -36,6 +39,11 @@ function App() {
       ...formFields,
       [e.target.name]: e.target.value
     })
+  }
+
+  const handleShow = (e) => {
+    e.preventDefault()
+    setShow(prevShow => !prevShow)
   }
 
   const handleTabClick = (e, tab) => {
@@ -57,6 +65,34 @@ function App() {
     }));
     console.log(data, newData)
     setData(newData)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if(formFields.name.length > 25 ) {
+      alert("Name length is more than 25 characters")
+      return
+    };
+    if(formFields.leaseEndDate < minDate ) {
+      alert("LeaseEndDate should be in the future")
+      return
+    };
+    if(formFields.name.length < 1 ||  !formFields.leaseEndDate) {
+      alert("Incomplete form")
+      return
+    };
+    setLoading(true)
+    Service.addTenant(formFields).then((res) => {
+      setData([...data,res]);
+      setTabActive(TAB_NAVIGATOR.all)
+      setFormFields(INITIAL_FORM)
+      setLoading(false)
+    }, error =>{
+      console.error(error)
+      setLoading(false)
+      setError(true)
+    })
   }
 
   useEffect(() => {
@@ -116,8 +152,8 @@ function App() {
             </thead>
             <tbody>
             {
-              loading ? "Loading..." : data.map((eachData) => 
-             <tr key={eachData.id}>
+              loading ? "Loading..." : data.map((eachData, index) => 
+              <tr key={index}>
                 <th>{eachData.id}</th>
                 <td>{eachData.name}</td>
                 <td>{eachData.paymentStatus}</td>
@@ -131,10 +167,10 @@ function App() {
           </table>
         </div>
         <div className="container">
-          <button className="btn btn-secondary">Add Tenant</button>
+          <button onClick={handleShow} className="btn btn-secondary" disabled={show}>Add Tenant</button>
         </div>
-        <div className="container">
-          <form>
+        <div className="container" style={{display: show ? 'block' : 'none'}}>
+          <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Name</label>
               <input 
@@ -163,10 +199,12 @@ function App() {
                 name='leaseEndDate' 
                 value={formFields.leaseEndDate} 
                 onChange={handleChange}
+                type='date'
+                min={minDate.substring(0, 10)}
               />
             </div>
-            <button className="btn btn-primary">Save</button>
-            <button className="btn">Cancel</button>
+            <button onClick={handleSubmit} disabled={error} className="btn btn-primary">Save</button>
+            <button className="btn" onClick={handleShow}>Cancel</button>
           </form>
         </div>
       </>
