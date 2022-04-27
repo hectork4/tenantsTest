@@ -34,7 +34,6 @@ function App() {
   const [show, setShow] = useState(false)
 
   const handleChange = (e) => {
-    console.log(e.target.name, e.target.value)
     setFormFields({
       ...formFields,
       [e.target.name]: e.target.value
@@ -47,7 +46,6 @@ function App() {
   }
 
   const handleTabClick = (e, tab) => {
-    console.log(e, tab)
     e.preventDefault();
     setTabActive(tab)
   }
@@ -63,7 +61,7 @@ function App() {
 
       return 0;
     }));
-    console.log(data, newData)
+    console.log(newData)
     setData(newData)
   }
 
@@ -90,6 +88,18 @@ function App() {
       setLoading(false)
     }, error =>{
       console.error(error)
+      setLoading(false)
+      setError(true)
+    })
+  }
+
+  const handleDelete = (id) => {
+    Service.deleteTenant(id).then((res) => {
+      setData(data.filter(eachData => eachData.id !== id));
+      setLoading(false)
+    }, error =>{
+      console.error(error)
+      alert("An error has occurred, please try again")
       setLoading(false)
       setError(true)
     })
@@ -159,7 +169,7 @@ function App() {
                 <td>{eachData.paymentStatus}</td>
                 <td>{eachData.leaseEndDate}</td>
                 <td>
-                  <button className="btn btn-danger">Delete</button>
+                  <button className="btn btn-danger" onClick={() => handleDelete(eachData.id)}>Delete</button>
                 </td>
               </tr>
               )}
