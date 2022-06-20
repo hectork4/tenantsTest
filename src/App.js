@@ -32,6 +32,7 @@ function App() {
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
   const [show, setShow] = useState(false)
+  const [, setChanges] = useState(0)
 
   const handleChange = (e) => {
     setFormFields({
@@ -61,7 +62,7 @@ function App() {
 
       return 0;
     }));
-    console.log(newData)
+    setChanges(prev => prev + 1)
     setData(newData)
   }
 
@@ -132,6 +133,18 @@ function App() {
       setError(true);
     })
   }, [tabActive, error])
+  
+  const getRowTable = () => 
+    data.map((eachData) => 
+      <tr key={eachData.id}>
+        <th>{eachData.id}</th>
+        <td>{eachData.name}</td>
+        <td>{eachData.paymentStatus}</td>
+        <td>{eachData.leaseEndDate}</td>
+        <td>
+          <button className="btn btn-danger" onClick={() => handleDelete(eachData.id)}>Delete</button>
+        </td>
+      </tr>)
 
   return (
       <>
@@ -155,24 +168,22 @@ function App() {
               <tr>
                 {
                   Object.entries(HEADERS).map((header) => 
-                    <th name={header[1]} onClick={() => handleHeaderClick(header[0])} key={header[1]}>{header[1]}</th>
+                    <th 
+                      name={header[1]}
+                      style={{cursor:'pointer'}}
+                      onClick={() => handleHeaderClick(header[0])} key={header[1]}
+                      >
+                        {header[1]}
+                      
+                    </th>
                   )
                 }
               </tr>
             </thead>
             <tbody>
             {
-              loading ? "Loading..." : data.map((eachData, index) => 
-              <tr key={index}>
-                <th>{eachData.id}</th>
-                <td>{eachData.name}</td>
-                <td>{eachData.paymentStatus}</td>
-                <td>{eachData.leaseEndDate}</td>
-                <td>
-                  <button className="btn btn-danger" onClick={() => handleDelete(eachData.id)}>Delete</button>
-                </td>
-              </tr>
-              )}
+              loading ? "Loading..." : getRowTable()
+              }
             </tbody>
           </table>
         </div>
